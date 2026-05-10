@@ -132,9 +132,15 @@ RED_FLAG_RULES: List[tuple[str, str, Callable[[str], bool]]] = [
                 "boğuluyor",
                 "boğulacak",
             ])
+            # Nefes/soluk + zorlanma
+            or (has_any(t, ["nefes", "soluk"])
+                and has_any(t, ["zorlan", "yetmiyor", "yetersiz"]))
             or (has_any(t, ["dudak", "dudaklarım", "parmak"])
                 and "mor" in t)
-            or ("astım" in t and has_any(t, ["geçmiyor", "etki etmiyor", "fayda etmiyor"]))
+            or ("astım" in t and has_any(t, [
+                "geçmiyor", "etki etmiyor", "fayda etmiyor",
+                "hiç fayda", "iş görmüyor",
+            ]))
         ),
     ),
 
@@ -146,6 +152,8 @@ RED_FLAG_RULES: List[tuple[str, str, Callable[[str], bool]]] = [
             has_any(t, [
                 "bilinç kayb",
                 "konuşam",
+                "konuşmakta zorlan",
+                "konuşmam zor",
                 "felç",
                 "inme",
                 "nöbet",
@@ -159,11 +167,16 @@ RED_FLAG_RULES: List[tuple[str, str, Callable[[str], bool]]] = [
             # "Hayatımın en şiddetli baş ağrısı"
             or ("baş ağrı" in t and has_any(t, [
                 "hayatımın en", "en şiddetli", "en kötü", "ani başla",
-                "patlar gibi", "yıldırım gibi",
+                "patlar gibi", "yıldırım gibi", "aniden başla",
             ]))
             # Tek taraflı güçsüzlük + ekstremite
             or (has_any(t, ["tek tarafım", "sağ tarafım", "sol tarafım"])
                 and has_any(t, ["güç kayb", "kalkamı", "tutmu", "hissetmi"]))
+            # Cauda equina: bel ağrısı + idrar/dışkı kaçırma
+            or (has_any(t, ["bel", "belim"])
+                and has_any(t, ["idrar tutamı", "idrar kaçır",
+                                "dışkı tutamı", "dışkı kaçır",
+                                "kaka tutamı"]))
         ),
     ),
 
@@ -195,7 +208,7 @@ RED_FLAG_RULES: List[tuple[str, str, Callable[[str], bool]]] = [
             # Karın + şiddet ifadesi + ağrı
             (has_any(t, ["karın", "karnım", "karnıma", "karında"])
              and has_any(t, ["şiddetli", "çok fena", "çok kötü", "dayanılm",
-                             "müthiş", "çok şiddetli", "feci"])
+                             "müthiş", "çok şiddetli", "feci", "yoğun"])
              and has_any(t, ["ağrı", "sancı"]))
             # Karın sertliği / dokunma intoleransı
             or (has_any(t, ["karın", "karnım", "karnıma"])
@@ -357,7 +370,9 @@ class RiskScorer:
     ) -> tuple[RiskLevel, str, float]:
         """LLM'e sor, (seviye, gerekçe, güven) döndür."""
         if self.llm is None:
-            return RiskLevel.MEDIUM, "LLM mevcut değil; varsayılan ORTA.", 0.3
+            # LLM yoksa varsayılan olarak DÜŞÜK döner; risk grubu uplift
+            # gerekirse onu sonra ORTA'ya yükseltir.
+            return RiskLevel.LOW, "LLM mevcut değil; varsayılan DÜŞÜK.", 0.3
 
         prompt = LLM_SCORING_PROMPT.format(
             rag_context=rag_context if rag_context else "(referans yok)",
@@ -467,7 +482,7 @@ if __name__ == "__main__":
     test_cases = [
         # (metin, beklenen_seviye, açıklama)
         ("Burnum akıyor, hafif öksürüğüm var",
-         RiskLevel.MEDIUM, "Hafif belirti — LLM'siz default ORTA"),
+         RiskLevel.LOW, "Hafif belirti — LLM'siz default DÜŞÜK"),
 
         ("Göğsümde basınç hissediyorum, sol koluma vuruyor",
          RiskLevel.URGENT, "Klasik kalp belirtisi — kural tabanlı"),
@@ -485,7 +500,7 @@ if __name__ == "__main__":
          RiskLevel.URGENT, "Apandisit klasiği"),
 
         ("3 gündür hafif baş ağrım var",
-         RiskLevel.MEDIUM, "Belirsiz — LLM'siz default"),
+         RiskLevel.LOW, "Belirsiz — LLM'siz default DÜŞÜK"),
 
         ("Hayatımın en şiddetli baş ağrısı, ani başladı",
          RiskLevel.URGENT, "Tunderclap baş ağrısı — nörolojik"),
@@ -500,7 +515,7 @@ if __name__ == "__main__":
          RiskLevel.URGENT, "İç kanama belirtisi"),
 
         ("Mide bulantım var, hafif",
-         RiskLevel.MEDIUM, "Hafif sindirim — default"),
+         RiskLevel.LOW, "Hafif sindirim — default DÜŞÜK"),
     ]
 
     pass_count = 0

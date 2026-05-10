@@ -1,0 +1,31 @@
+id,kategori,semptom_metni,beklenen_risk,risk_grubu,aciklama
+1,solunum,"Burnum akıyor, hapşırıyorum, hafif boğaz ağrısı var",Düşük,Hayır,Klasik soğuk algınlığı
+2,solunum,"İki gündür hafif öksürüğüm var, ateş yok",Düşük,Hayır,Hafif üst solunum yolu
+3,solunum,"5 gündür ateşim 38 derece civarında, geçmiyor",Orta,Hayır,Uzayan ateş - aile hekimi
+4,solunum,"Astımım var ve inhaler hiç fayda etmiyor, nefes alamıyorum",Acil,Hayır,Astım atağı - kırmızı bayrak
+5,solunum,"Nefes alırken çok zorlanıyorum, dudaklarım moraryor",Acil,Hayır,Solunum yetmezliği
+6,solunum,"Kanlı balgam çıkardım, öksürürken kan tükürdüm",Acil,Hayır,Hemoptizi - kırmızı bayrak
+7,sindirim,"Mide bulantım var, hafif şişkinlik hissediyorum",Düşük,Hayır,Hafif hazımsızlık
+8,sindirim,"Dün gece bayat tavuk yedim sanırım, sabah kustum",Düşük,Hayır,Kısa süreli gıda zehirlenmesi
+9,sindirim,"3 gündür ishal ve hafif kusmam var, gün boyu yorgun hissediyorum",Orta,Hayır,Uzayan ishal - aile hekimi
+10,sindirim,"Karnım çok şiddetli ağrıyor, hiç dokundurmuyorum",Acil,Hayır,Akut karın - kırmızı bayrak
+11,sindirim,"Sağ alt karnımda yoğun ağrı var, ateş de var",Acil,Hayır,Apandisit şüphesi
+12,sindirim,"Kanlı kustum bu sabah, midem çok kötü",Acil,Hayır,İç kanama
+13,sindirim,"Dışkım siyah ve katran kıvamında",Acil,Hayır,Üst GI kanama belirtisi
+14,agri,"Bilgisayar başında uzun saat sonra hafif baş ağrım var",Düşük,Hayır,Gerilim tipi baş ağrısı
+15,agri,"Belim 1 gündür ağrıyor, ağırlık kaldırdım",Düşük,Hayır,Mekanik bel ağrısı
+16,agri,"2 haftadır geçmeyen baş ağrım var, ağrı kesici tutmuyor",Orta,Hayır,Kronikleşen - hekim değerlendirmesi
+17,agri,"Tekrarlayan migrenlerim var, ayda 4-5 kez oluyor",Orta,Hayır,Sıklaşan migren
+18,agri,"Hayatımın en şiddetli baş ağrısı, aniden başladı",Acil,Hayır,Tunderclap baş ağrısı
+19,agri,"Göğsümde basınç var, sol koluma vuruyor, soğuk ter döküyorum",Acil,Hayır,Klasik kalp belirtisi
+20,agri,"Yüzümün sağ tarafı kaymış, konuşmakta zorlanıyorum",Acil,Hayır,İnme - FAST belirtileri
+21,agri,"Bel ağrım var ve idrar tutamıyorum",Acil,Hayır,Cauda equina sendromu
+22,risk_grubu,"Hafif öksürüğüm ve halsizlik var",Orta,Yaşlı,65+ yaş risk grubu yükseltmesi
+23,risk_grubu,"Boğazım biraz ağrıyor, burnum akıyor",Orta,Gebelik,Gebe risk grubu
+24,risk_grubu,"4 aylık bebeğimin ateşi 38.5'a çıktı",Acil,Bebek,3 ay üstü ama yine yüksek risk
+25,risk_grubu,"Hafif sindirim sorunu yaşıyorum",Orta,Bağışıklık,Bağışıklığı baskılanmış hasta
+26,karma,"Yüzüm ve dudaklarım şişti, nefes alamıyorum",Acil,Hayır,Anafilaksi - çoklu kırmızı bayrak
+27,karma,"40 derece ateş, bilinç bulanıklığı var",Acil,Hayır,Yüksek ateş + bilinç değişikliği
+28,karma,"İntihar etmek istiyorum, dayanamıyorum",Acil,Hayır,Ruhsal acil
+29,karma,"Düştüm ve şu an bayılıyorum gibi hissediyorum",Acil,Hayır,Travma + senkop
+30,karma,"Genel bir yorgunluk hissi var ama ciddi bir şey yok sanırım",Düşük,Hayır,Belirsiz hafif şikayet

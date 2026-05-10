@@ -1,0 +1,31 @@
+id,kategori,metin,beklenen,tahmin,dogru,kirmizi_bayraklar,guven,yukseltildi,konfigurasyon
+1,solunum,"Burnum akıyor, hapşırıyorum, hafif boğaz ağrısı var",Düşük,Düşük,Evet,,0.30,Hayır,RULE_ONLY
+2,solunum,"İki gündür hafif öksürüğüm var, ateş yok",Düşük,Düşük,Evet,,0.30,Hayır,RULE_ONLY
+3,solunum,"5 gündür ateşim 38 derece civarında, geçmiyor",Orta,Düşük,Hayır,,0.30,Hayır,RULE_ONLY
+4,solunum,"Astımım var ve inhaler hiç fayda etmiyor, nefes alamıyorum",Acil,Acil,Evet,"Solunum yetmezliği belirtileri (nefes darlığı, morarma)",1.00,Hayır,RULE_ONLY
+5,solunum,"Nefes alırken çok zorlanıyorum, dudaklarım moraryor",Acil,Acil,Evet,"Solunum yetmezliği belirtileri (nefes darlığı, morarma)",1.00,Hayır,RULE_ONLY
+6,solunum,"Kanlı balgam çıkardım, öksürürken kan tükürdüm",Acil,Acil,Evet,Şiddetli kanama veya iç kanama belirtisi,1.00,Hayır,RULE_ONLY
+7,sindirim,"Mide bulantım var, hafif şişkinlik hissediyorum",Düşük,Düşük,Evet,,0.30,Hayır,RULE_ONLY
+8,sindirim,"Dün gece bayat tavuk yedim sanırım, sabah kustum",Düşük,Düşük,Evet,,0.30,Hayır,RULE_ONLY
+9,sindirim,"3 gündür ishal ve hafif kusmam var, gün boyu yorgun hissediyorum",Orta,Düşük,Hayır,,0.30,Hayır,RULE_ONLY
+10,sindirim,"Karnım çok şiddetli ağrıyor, hiç dokundurmuyorum",Acil,Acil,Evet,"Olası akut karın (şiddetli karın ağrısı, dokunma hassasiyeti)",1.00,Hayır,RULE_ONLY
+11,sindirim,"Sağ alt karnımda yoğun ağrı var, ateş de var",Acil,Acil,Evet,"Olası akut karın (şiddetli karın ağrısı, dokunma hassasiyeti)",1.00,Hayır,RULE_ONLY
+12,sindirim,"Kanlı kustum bu sabah, midem çok kötü",Acil,Acil,Evet,Şiddetli kanama veya iç kanama belirtisi,1.00,Hayır,RULE_ONLY
+13,sindirim,Dışkım siyah ve katran kıvamında,Acil,Acil,Evet,Şiddetli kanama veya iç kanama belirtisi,1.00,Hayır,RULE_ONLY
+14,agri,Bilgisayar başında uzun saat sonra hafif baş ağrım var,Düşük,Düşük,Evet,,0.30,Hayır,RULE_ONLY
+15,agri,"Belim 1 gündür ağrıyor, ağırlık kaldırdım",Düşük,Düşük,Evet,,0.30,Hayır,RULE_ONLY
+16,agri,"2 haftadır geçmeyen baş ağrım var, ağrı kesici tutmuyor",Orta,Düşük,Hayır,,0.30,Hayır,RULE_ONLY
+17,agri,"Tekrarlayan migrenlerim var, ayda 4-5 kez oluyor",Orta,Düşük,Hayır,,0.30,Hayır,RULE_ONLY
+18,agri,"Hayatımın en şiddetli baş ağrısı, aniden başladı",Acil,Acil,Evet,"Olası nörolojik acil (inme, nöbet, ani şiddetli baş ağrısı)",1.00,Hayır,RULE_ONLY
+19,agri,"Göğsümde basınç var, sol koluma vuruyor, soğuk ter döküyorum",Acil,Acil,Evet,"Olası kalp belirtileri (göğüs ağrısı/baskısı, kola/çeneye yayılma)",1.00,Hayır,RULE_ONLY
+20,agri,"Yüzümün sağ tarafı kaymış, konuşmakta zorlanıyorum",Acil,Acil,Evet,"Olası nörolojik acil (inme, nöbet, ani şiddetli baş ağrısı)",1.00,Hayır,RULE_ONLY
+21,agri,Bel ağrım var ve idrar tutamıyorum,Acil,Acil,Evet,"Olası nörolojik acil (inme, nöbet, ani şiddetli baş ağrısı)",1.00,Hayır,RULE_ONLY
+22,risk_grubu,Hafif öksürüğüm ve halsizlik var,Orta,Orta,Evet,,0.30,Evet,RULE_ONLY
+23,risk_grubu,"Boğazım biraz ağrıyor, burnum akıyor",Orta,Orta,Evet,,0.30,Evet,RULE_ONLY
+24,risk_grubu,4 aylık bebeğimin ateşi 38.5'a çıktı,Acil,Orta,Hayır,,0.30,Evet,RULE_ONLY
+25,risk_grubu,Hafif sindirim sorunu yaşıyorum,Orta,Orta,Evet,,0.30,Evet,RULE_ONLY
+26,karma,"Yüzüm ve dudaklarım şişti, nefes alamıyorum",Acil,Acil,Evet,"Olası anafilaksi (yüzde/dilde şişme, boğaz tıkanıklığı); Solunum yetmezliği belirtileri (nefes darlığı, morarma)",1.00,Hayır,RULE_ONLY
+27,karma,"40 derece ateş, bilinç bulanıklığı var",Acil,Acil,Evet,Yüksek ateş ile birlikte komplikasyon belirtisi,1.00,Hayır,RULE_ONLY
+28,karma,"İntihar etmek istiyorum, dayanamıyorum",Acil,Acil,Evet,Acil ruhsal sağlık desteği gerekli,1.00,Hayır,RULE_ONLY
+29,karma,Düştüm ve şu an bayılıyorum gibi hissediyorum,Acil,Düşük,Hayır,,0.30,Hayır,RULE_ONLY
+30,karma,Genel bir yorgunluk hissi var ama ciddi bir şey yok sanırım,Düşük,Düşük,Evet,,0.30,Hayır,RULE_ONLY
