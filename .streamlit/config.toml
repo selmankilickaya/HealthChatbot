@@ -8,6 +8,11 @@ font = "sans serif"
 [server]
 maxUploadSize = 5
 enableCORS = false
+enableXsrfProtection = true
+maxMessageSize = 50
 
 [client]
 showErrorDetails = true
+
+[runner]
+fastReruns = true
