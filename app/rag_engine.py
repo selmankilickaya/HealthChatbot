@@ -10,6 +10,7 @@ Kullanım:
 """
 from pathlib import Path
 from typing import List, Optional, Tuple
+import os
 import shutil
 
 from langchain_chroma import Chroma
@@ -18,7 +19,29 @@ from langchain_core.documents import Document
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "chroma_db"
+
+
+def _get_default_db_path() -> Path:
+    """
+    Veritabanı yolunu ortama göre seç:
+    - Yerel ortam: data/chroma_db/ (kalıcı)
+    - Streamlit Cloud: /tmp/chroma_db/ (yazılabilir, geçici)
+    - Ortam değişkeni varsa onu kullan
+    """
+    # 1. Ortam değişkeni öncelikli
+    env_path = os.getenv("CHROMA_DB_PATH")
+    if env_path:
+        return Path(env_path)
+
+    # 2. Streamlit Cloud algıla — /mount/src altında çalışır, repo readonly
+    if Path("/mount/src").exists() or os.getenv("STREAMLIT_SHARING") or os.getenv("STREAMLIT_RUNTIME"):
+        return Path("/tmp/chroma_db")
+
+    # 3. Yerel — proje klasörüne yaz
+    return PROJECT_ROOT / "data" / "chroma_db"
+
+
+DEFAULT_DB_PATH = _get_default_db_path()
 
 # Türkçe destekli, çok dilli embedding modeli (HuggingFace)
 # ~120 MB, ilk kullanımda otomatik indirilir, sonra önbellekten kullanılır
