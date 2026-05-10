@@ -1,9 +1,13 @@
 """
 streamlit_app.py
-Türkçe Semptom Değerlendirici — Ana Streamlit arayüzü.
+Türkçe Semptom Değerlendirici — Streamlit Arayüzü.
 
-Çalıştırma:
+Yerel kullanım:
     streamlit run streamlit_app.py
+
+Streamlit Cloud:
+    Otomatik olarak başlatılır. .env yerine st.secrets okur.
+    Veri tabanı yoksa otomatik olarak ilk açılışta indekslenir.
 """
 from pathlib import Path
 import os
@@ -19,7 +23,7 @@ from app.risk_scorer import RiskScorer, RiskLevel, UserContext
 # ---------------------------------------------------------------------------
 # Sayfa konfigürasyonu
 # ---------------------------------------------------------------------------
-load_dotenv()
+load_dotenv()  # .env dosyasını yükle (yerelde)
 
 st.set_page_config(
     page_title="Türkçe Semptom Değerlendirici",
@@ -45,24 +49,47 @@ WELCOME_MESSAGE = (
 
 
 # ---------------------------------------------------------------------------
-# Önbelleğe alınmış sistem başlatıcılar (Streamlit cache)
+# API anahtarı çözümü (öncelik: Streamlit Secrets > .env)
 # ---------------------------------------------------------------------------
-@st.cache_resource(show_spinner="Bilgi tabanı yükleniyor...")
+def get_api_key() -> str:
+    """API anahtarını Cloud'da st.secrets, yerelde .env'den oku."""
+    # Streamlit Cloud secrets
+    try:
+        if "ANTHROPIC_API_KEY" in st.secrets:
+            return st.secrets["ANTHROPIC_API_KEY"]
+    except Exception:
+        pass
+    # Yerel .env
+    return os.getenv("ANTHROPIC_API_KEY", "")
+
+
+# ---------------------------------------------------------------------------
+# Önbelleğe alınmış sistem başlatıcılar
+# ---------------------------------------------------------------------------
+@st.cache_resource(show_spinner="📚 Bilgi tabanı yükleniyor...")
 def get_rag_engine() -> RAGEngine:
-    """RAG motorunu bir kez başlat, oturumlar arası paylaş."""
+    """RAG motorunu başlat. ChromaDB boşsa otomatik indeksle (Cloud için)."""
     engine = RAGEngine(verbose=False)
+
+    # Cloud'da ChromaDB her başlangıçta sıfırdan oluşturulur
+    if not engine.is_indexed():
+        with st.spinner("🔧 İlk kurulum: Bilgi tabanı oluşturuluyor (1-2 dakika)..."):
+            from app.data_loader import load_and_chunk
+            chunks = load_and_chunk()
+            if chunks:
+                engine.index_documents(chunks)
+
     return engine
 
 
-@st.cache_resource(show_spinner="Asistan hazırlanıyor...")
+@st.cache_resource(show_spinner="🤖 Asistan hazırlanıyor...")
 def get_chatbot(_rag_engine: RAGEngine) -> HealthChatbot:
-    """Chatbot'u bir kez başlat (API anahtarı ortamdan alınır)."""
-    return HealthChatbot(rag_engine=_rag_engine)
+    api_key = get_api_key()
+    return HealthChatbot(rag_engine=_rag_engine, api_key=api_key)
 
 
 @st.cache_resource
 def get_risk_scorer(_chatbot: HealthChatbot) -> RiskScorer:
-    """Risk skorlayıcı, chatbot'un LLM'ini paylaşır (ekstra API yükü yok)."""
     return RiskScorer(llm=_chatbot.llm)
 
 
@@ -70,27 +97,18 @@ def get_risk_scorer(_chatbot: HealthChatbot) -> RiskScorer:
 # Sistem hazırlık kontrolü
 # ---------------------------------------------------------------------------
 def check_system_ready() -> tuple[bool, str]:
-    """ChromaDB ve API key durumunu kontrol eder."""
-    api_key = os.getenv("ANTHROPIC_API_KEY", "")
+    """API key durumunu kontrol et."""
+    api_key = get_api_key()
     if not api_key or api_key.startswith("sk-ant-..."):
         return False, (
             "❌ **ANTHROPIC_API_KEY** tanımlı değil.\n\n"
-            "1. Proje kökünde `.env` dosyasını aç\n"
-            "2. `ANTHROPIC_API_KEY=sk-ant-...` satırına gerçek anahtarınızı yapıştır\n"
-            "3. Streamlit'i yeniden başlat (`Ctrl+C` → tekrar `streamlit run`)"
+            "**Streamlit Cloud kullanıcılarına:** App ayarlarından (⋮ menüsü) "
+            "**Secrets** bölümüne `ANTHROPIC_API_KEY = \"sk-ant-...\"` "
+            "satırını ekleyin.\n\n"
+            "**Yerel kullanıcılara:** Proje kökünde `.env` dosyasını oluşturun "
+            "ve `ANTHROPIC_API_KEY=sk-ant-...` satırını ekleyin."
         )
-
-    try:
-        rag = get_rag_engine()
-        if not rag.is_indexed():
-            return False, (
-                "❌ **Bilgi tabanı boş.**\n\n"
-                "Aşağıdaki komutu terminalde çalıştırın:\n\n"
-                "```\npython scripts/build_index.py\n```"
-            )
-        return True, ""
-    except Exception as e:
-        return False, f"❌ Sistem başlatılamadı: {e}"
+    return True, ""
 
 
 # ---------------------------------------------------------------------------
@@ -109,7 +127,6 @@ def render_sidebar() -> UserContext:
             index=0,
         )
 
-        # Yaş eşlemesi
         age_map = {
             "0-1 yaş (bebek)": 0,
             "1-5 yaş": 3,
@@ -135,7 +152,6 @@ def render_sidebar() -> UserContext:
 
         st.header("📊 Risk Seviyesi")
         risk_placeholder = st.empty()
-        # İlk render — boş durum
         if "last_risk" not in st.session_state:
             risk_placeholder.info("Henüz değerlendirme yapılmadı.")
         else:
@@ -159,7 +175,8 @@ def render_sidebar() -> UserContext:
             st.rerun()
 
         st.caption(
-            "Geliştirici: [Selman Kılıçkaya](https://github.com/selmankilickaya/HealthChatbot)"
+            "💻 [GitHub](https://github.com/selmankilickaya/HealthChatbot) | "
+            "Selman Kılıçkaya"
         )
 
     return UserContext(
@@ -171,9 +188,6 @@ def render_sidebar() -> UserContext:
     )
 
 
-# ---------------------------------------------------------------------------
-# Risk kartı çizici
-# ---------------------------------------------------------------------------
 def render_risk_card(assessment, container=None):
     """Risk seviyesine göre renkli kart göster."""
     target = container if container is not None else st
@@ -211,7 +225,7 @@ def render_risk_card(assessment, container=None):
 # ---------------------------------------------------------------------------
 def main():
     st.title("🩺 Türkçe Semptom Değerlendirici")
-    st.caption("LLM + RAG tabanlı sağlık karar destek sistemi")
+    st.caption("LLM + RAG tabanlı sağlık karar destek sistemi · Prototip")
     st.warning(DISCLAIMER)
 
     # Sistem hazır mı?
@@ -223,25 +237,36 @@ def main():
     # Yan panel + kullanıcı profili
     user_context = render_sidebar()
 
-    # Bileşenleri başlat (cache'li)
-    rag = get_rag_engine()
-    chatbot = get_chatbot(rag)
-    scorer = get_risk_scorer(chatbot)
+    # Bileşenleri başlat (cache'li, yan panel render'ı sırasında değil sonra)
+    try:
+        rag = get_rag_engine()
+        if not rag.is_indexed():
+            st.error(
+                "❌ Bilgi tabanı oluşturulamadı. Lütfen logları kontrol edin."
+            )
+            st.stop()
+
+        chatbot = get_chatbot(rag)
+        scorer = get_risk_scorer(chatbot)
+    except Exception as e:
+        st.error(f"❌ Sistem başlatılamadı: `{type(e).__name__}: {e}`")
+        st.info(
+            "Bu hata genellikle API anahtarı sorunundan kaynaklanır. "
+            "Anahtarınızın doğru olduğundan ve hesabınızda kredi olduğundan emin olun."
+        )
+        st.stop()
 
     # Sohbet geçmişi
     if "messages" not in st.session_state:
-        st.session_state.messages = []
-        # Karşılama mesajı
-        st.session_state.messages.append({
+        st.session_state.messages = [{
             "role": "assistant",
             "content": WELCOME_MESSAGE,
-        })
+        }]
 
     # Geçmişi render et
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
-            # Asistan mesajının altında kaynaklar (varsa)
             if msg["role"] == "assistant" and msg.get("sources"):
                 with st.expander("📎 Kullanılan kaynaklar"):
                     for src in msg["sources"]:
@@ -249,26 +274,21 @@ def main():
 
     # Yeni mesaj girişi
     if prompt := st.chat_input("Şikayetinizi yazınız..."):
-        # Kullanıcı mesajını göster ve kaydet
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        # Asistan cevabı
         with st.chat_message("assistant"):
             try:
                 with st.spinner("Düşünüyor..."):
-                    # Geçmişi chatbot için hazırla (sadece user/assistant rolleri)
                     history = [
                         {"role": m["role"], "content": m["content"]}
-                        for m in st.session_state.messages[:-1]  # son mesaj hariç
+                        for m in st.session_state.messages[:-1]
                         if m["role"] in ("user", "assistant")
                     ]
 
-                    # 1) Cevap üret
                     answer, sources = chatbot.respond(prompt, history=history)
 
-                    # 2) Risk skoru hesapla — son birkaç kullanıcı mesajını birleştir
                     user_messages_text = "\n".join(
                         m["content"]
                         for m in st.session_state.messages
@@ -283,28 +303,21 @@ def main():
                         user_context=user_context,
                     )
 
-                # Cevabı göster
                 st.markdown(answer)
 
-                # Kaynaklar
                 source_names = list({s.metadata.get("source_file", "?") for s in sources})
                 if source_names:
                     with st.expander("📎 Kullanılan kaynaklar"):
                         for src in source_names:
                             st.markdown(f"- `{src}`")
 
-                # Mesajı geçmişe kaydet
                 st.session_state.messages.append({
                     "role": "assistant",
                     "content": answer,
                     "sources": source_names,
                 })
-
-                # Risk durumunu sakla — yan panel rerun'da görür
                 st.session_state.last_risk = risk
                 st.session_state.last_sources = source_names
-
-                # Yan paneli güncellemek için rerun
                 st.rerun()
 
             except Exception as e:
