@@ -103,7 +103,7 @@ streamlit run streamlit_app.py
 
 ## Akademik Bağlam
 
-Bu proje [Ders Adı] kapsamında geliştirilmiştir.
+Bu proje Yazılım Mühendisliği Yüksek Lisans kapsamında geliştirilmiştir.
 
 ## Lisans
 
