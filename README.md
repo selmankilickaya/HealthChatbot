@@ -93,13 +93,13 @@ streamlit run streamlit_app.py
 ## Yol Haritası
 
 - [x] Proje yapısının oluşturulması
-- [ ] Veri hazırlık modülü (WHO + Sağlık Bakanlığı kaynakları)
-- [ ] RAG altyapısı (ChromaDB + Türkçe embedding)
-- [ ] LangChain konuşma motoru
-- [ ] Risk skorlama hibrit motoru
-- [ ] Streamlit arayüzü
-- [ ] Saha testi (10+ gönüllü kullanıcı)
-- [ ] Etik sınır analizi dokümantasyonu
+- [x] Veri hazırlık modülü (WHO + Sağlık Bakanlığı kaynakları)
+- [x] RAG altyapısı (ChromaDB + Türkçe embedding)
+- [x] LangChain konuşma motoru
+- [x] Risk skorlama hibrit motoru
+- [x] Streamlit arayüzü
+- [x] Saha testi (10+ gönüllü kullanıcı)
+- [x] Etik sınır analizi dokümantasyonu
 
 ## Akademik Bağlam
 
