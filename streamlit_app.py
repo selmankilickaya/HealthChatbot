@@ -69,7 +69,18 @@ def get_api_key() -> str:
 @st.cache_resource(show_spinner="📚 Bilgi tabanı yükleniyor...")
 def get_rag_engine() -> RAGEngine:
     """RAG motorunu başlat. ChromaDB boşsa otomatik indeksle (Cloud için)."""
-    engine = RAGEngine(verbose=False)
+    import tempfile
+    from pathlib import Path
+
+    # Streamlit Cloud'da /tmp yazılabilir, repo readonly
+    # Yerelde de /tmp çalışır, sorun olmaz
+    db_path = Path(tempfile.gettempdir()) / "saglik_chroma_db"
+    db_path.mkdir(parents=True, exist_ok=True)
+
+    print(f"[DEBUG] ChromaDB path: {db_path}")
+    print(f"[DEBUG] Path writable: {os.access(db_path, os.W_OK)}")
+
+    engine = RAGEngine(db_path=db_path, verbose=False)
 
     # Cloud'da ChromaDB her başlangıçta sıfırdan oluşturulur
     if not engine.is_indexed():
